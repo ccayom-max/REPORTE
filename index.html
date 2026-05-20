@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cerro Nevado S.A. - Reporte Diario de Obra</title>
+    <!-- Tailwind CSS para Interfaz de Usuario -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans">
+
+    <header class="bg-slate-800 text-white p-6 shadow-md">
+        <div class="container mx-auto flex justify-between items-center">
+            <div>
+                <h1 class="text-2xl font-bold tracking-wide">SISTEMA DE CONTROL DE PROYECTOS</h1>
+                <p class="text-sm text-slate-400">Reporte Diario de Obra | Metodología del Valor Ganado</p>
+            </div>
+            <div class="text-right">
+                <span class="text-xs bg-emerald-600 px-3 py-1 rounded-full font-semibold">CONTRATISTA: CERRO NEVADO S.A.</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto p-4 my-6 max-w-6xl">
+        <form id="formReporte" class="space-y-6">
+            
+            <!-- SECCIÓN 1: DATOS GENERALES -->
+            <section class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                <h2 class="text-lg font-semibold text-slate-700 mb-4 border-b pb-2">1. Información General del Reporte</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-600 mb-1">Fecha de Reporte</label>
+                        <input type="date" id="fechaReporte" required class="w-full p-2 border rounded-md focus:ring-2 focus:ring-slate-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-600 mb-1">Responsable del Frente</label>
+                        <input type="text" id="responsable" placeholder="Nombre del Ingeniero / Supervisor" required class="w-full p-2 border rounded-md focus:ring-2 focus:ring-slate-500 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-600 mb-1">Código del Proyecto</label>
+                        <input type="text" value="EDIF-2026-01" readonly class="w-full p-2 bg-gray-100 border rounded-md text-gray-500">
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECCIÓN 2: AVANCE DE ACTIVIDADES (VALOR GANADO & PLANIFICADO) -->
+            <section class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                <h2 class="text-lg font-semibold text-slate-700 mb-4 border-b pb-2">2. Avance Físico de Actividades (EV / PV)</h2>
+                <p class="text-xs text-gray-500 mb-4">Seleccione las actividades ejecutadas según el WBS. Ingrese el avance real para calcular el Valor Ganado (EV) frente a la meta (PV).</p>
+                
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse" id="tablaActividades">
+                        <thead>
+                            <tr class="bg-slate-100 text-slate-700 text-sm">
+                                <th class="p-3 border">WBS / Ítems Ejecutados</th>
+                                <th class="p-3 border w-24">Unidad</th>
+                                <th class="p-3 border w-32">Meta Diaria (PV)</th>
+                                <th class="p-3 border w-36">Avance Real (EV)</th>
+                                <th class="p-3 border w-32">Costo PU ($)</th>
+                                <th class="p-3 border w-32">EV Calculado ($)</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200 text-sm">
+                            <!-- Inyección dinámica vía JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+                <button type="button" onclick="agregarFilaActividad()" class="mt-3 inline-flex items-center text-sm font-semibold text-slate-600 hover:text-slate-900">
+                    + Agregar Actividad Ejecutada
+                </button>
+            </section>
+
+            <!-- SECCIÓN 3: CONSUMO DE RECURSOS (COSTO REAL - AC) -->
+            <section class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                <h2 class="text-lg font-semibold text-slate-700 mb-4 border-b pb-2">3. Recursos Consumidos e Historial de Costos (AC)</h2>
+                <p class="text-xs text-gray-500 mb-4">El registro de consumos de Mano de Obra (MO), Materiales y Equipos se imputará directamente a nivel de WBS (Entregable Padre).</p>
+                
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse" id="tablaRecursos">
+                        <thead>
+                            <tr class="bg-slate-100 text-slate-700 text-sm">
+                                <th class="p-3 border">Imputación WBS (Padre)</th>
+                                <th class="p-3 border">Tipo Recurso</th>
+                                <th class="p-3 border">Descripción Recurso</th>
+                                <th class="p-3 border w-28">Cant. Consumida</th>
+                                <th class="p-3 border w-28">PU Real ($)</th>
+                                <th class="p-3 border w-32">Subtotal AC ($)</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200 text-sm">
+                            <!-- Inyección dinámica vía JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+                <button type="button" onclick="agregarFilaRecurso()" class="mt-3 inline-flex items-center text-sm font-semibold text-slate-600 hover:text-slate-900">
+                    + Imputar Recurso Consumido
+                </button>
+            </section>
+
+            <!-- SECCIÓN 4: RESUMEN DE CONTROL DIARIO -->
+            <section class="bg-slate-900 text-white p-6 rounded-lg shadow-md">
+                <h2 class="text-lg font-semibold text-slate-400 mb-4 border-b border-slate-700 pb-2">4. Balance Consolidado del Día (EVM)</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
+                    <div class="bg-slate-800 p-4 rounded-md">
+                        <p class="text-xs text-slate-400 uppercase font-medium">Valor Planificado Total (PV)</p>
+                        <p class="text-2xl font-bold mt-1 text-sky-400" id="resumenPV">$ 0.00</p>
+                    </div>
+                    <div class="bg-slate-800 p-4 rounded-md">
+                        <p class="text-xs text-slate-400 uppercase font-medium">Valor Ganado Total (EV)</p>
+                        <p class="text-2xl font-bold mt-1 text-emerald-400" id="resumenEV">$ 0.00</p>
+                    </div>
+                    <div class="bg-slate-800 p-4 rounded-md">
+                        <p class="text-xs text-slate-400 uppercase font-medium">Costo Real Total (AC)</p>
+                        <p class="text-2xl font-bold mt-1 text-amber-400" id="resumenAC">$ 0.00</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- BOTÓN DE ENVÍO -->
+            <div class="flex justify-end">
+                <button type="submit" class="bg-slate-800 text-white px-8 py-3 rounded-md font-semibold shadow hover:bg-slate-700 transition-colors focus:ring-4 focus:ring-slate-300">
+                    Transmitir Reporte Diario a Base Centralizada
+                </button>
+            </div>
+
+        </form>
+    </main>
+
+    <!-- LOGICA DE INTEGRACIÓN Y CÁLCULO -->
+    <script>
+        // URL de la API de Google Apps Script para el backend en Google Sheets
+        const WEB_APP_URL = "https://script.google.com/macros/s/TU_SCRIPT_ID_AQUI/exec";
+
+        // Simulacro de datos provenientes de archivos BD_EDT, BD_PV, BD_RRHH y BD_Almacen
+        // En producción, estos JSON se cargan mediante fetch('path/to/file.json')
+        const BD_EDT = [
+            { wbs_id: "WBS-1.1", descripcion: "Excavación Masiva de Terreno", unidad: "m3", presupuesto_pu: 15.50, padre_id: "WBS-1.0" },
+            { wbs_id: "WBS-1.2", descripcion: "Plantilla de Concreto Pobre H-10", unidad: "m2", presupuesto_pu: 12.00, padre_id: "WBS-1.0" },
+            { wbs_id: "WBS-2.1", descripcion: "Acero de Refuerzo en Fundaciones", unidad: "kg", presupuesto_pu: 2.80, padre_id: "WBS-2.0" },
+            { wbs_id: "WBS-2.2", descripcion: "Hormigonado de Zapatas Estructurales", unidad: "m3", presupuesto_pu: 110.00, padre_id: "WBS-2.0" }
+        ];
+
+        const BD_PV = [
+            { wbs_id: "WBS-1.1", fecha: "2026-05-18", metrado_plan_diario: 120, pv_diario_costo: 1860.00 },
+            { wbs_id: "WBS-1.2", fecha: "2026-05-18", metrado_plan_diario: 50, pv_diario_costo: 600.00 },
+            { wbs_id: "WBS-2.1", fecha: "2026-05-18", metrado_plan_diario: 0, pv_diario_costo: 0.00 },
+            { wbs_id: "WBS-2.2", fecha: "2026-05-18", metrado_plan_diario: 0, pv_diario_costo: 0.00 }
+        ];
+
+        const BD_RRHH = [
+            { recurso_id: "R-MO01", descripcion: "Operario de Maquinaria Pesada", categoria: "Operario", pu_hora: 25.00 },
+            { recurso_id: "R-MO02", descripcion: "Fierrero / Carpintero de Ribera", categoria: "Oficial", pu_hora: 20.00 },
+            { recurso_id: "R-MO03", descripcion: "Ayudante / Peón de Construcción", categoria: "Peón", pu_hora: 16.50 }
+        ];
+
+        const BD_Almacen = [
+            { recurso_id: "R-MAT01", descripcion: "Hormigón Premezclado H-30 R7", unidad: "m3", pu_real: 95.00 },
+            { recurso_id: "R-EQ01", descripcion: "Excavadora Oruga 22 Ton (Arriendo)", unidad: "hr", pu_real: 45.00 },
+            { recurso_id: "R-EQ02", descripcion: "Vibrador de Inmersión para Concreto", unidad: "dia", pu_real: 15.00 }
+        ];
+
+        // Inicialización al cargar la página
+        window.addEventListener('DOMContentLoaded', () => {
+            // Establecer fecha por defecto (Hoy)
+            document.getElementById('fechaReporte').value = new Date().toISOString().split('T')[0];
+            
+            // Agregar filas iniciales de ejemplo
+            agregarFilaActividad();
+            agregarFilaRecurso();
+            
+            // Listener para cambios de fecha que actualicen las metas (PV)
+            document.getElementById('fechaReporte').addEventListener('change', actualizarMetasYTotales);
+        });
+
+        // --- GESTIÓN DE LA TABLA DE AVANCE (EV / PV) ---
+        function agregarFilaActividad() {
+            const tbody = document.querySelector('#tablaActividades tbody');
+            const rowCount = tbody.rows.length;
+            
+            let opcionesWBS = BD_EDT.map(act => `<option value="${act.wbs_id}">${act.wbs_id} - ${act.descripcion}</option>`).join('');
+
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td class="p-2 border">
+                    <select class="w-full p-1 border rounded bg-white select-actividad" onchange="completarDatosActividad(this)">
+                        <option value="">-- Seleccione Actividad --</option>
+                        ${opcionesWBS}
+                    </select>
+                </td>
+                <td class="p-2 border text-center text-gray-500 unidad-act">-</td>
+                <td class="p-2 border text-right text-gray-600 font-medium pv-plan-txt">0.00</td>
+                <td class="p-2 border">
+                    <input type="number" step="any" min="0" value="0" class="w-full p-1 border rounded text-right input-ev" oninput="calcularFilaEV(this)">
+                </td>
+                <td class="p-2 border text-right text-gray-500 pu-act-txt">0.00</td>
+                <td class="p-2 border text-right font-semibold text-emerald-600 ev-costo-txt">0.00</td>
+            `;
+            tbody.appendChild(tr);
+        }
+
+        function completarDatosActividad(selectElement) {
+            const tr = selectElement.closest('tr');
+            const wbsId = selectElement.value;
+            const fecha = document.getElementById('fechaReporte').value;
+
+            if (!wbsId) return;
+
+            const actividad = BD_EDT.find(a => a.wbs_id === wbsId);
+            const planDiario = BD_PV.find(p => p.wbs_id === wbsId && p.fecha === fecha);
+
+            tr.querySelector('.unidad-act').textContent = actividad.unidad;
+            tr.querySelector('.pu-act-txt').textContent = actividad.presupuesto_pu.toFixed(2);
+            
+            const metradoPlan = planDiario ? planDiario.metrado_plan_diario : 0;
+            tr.querySelector('.pv-plan-txt').textContent = metradoPlan.toFixed(2);
+            tr.querySelector('.pv-plan-txt').setAttribute('data-pv-costo', planDiario ? planDiario.pv_diario_costo : 0);
+
+            calcularFilaEV(tr.querySelector('.input-ev'));
+        }
+
+        function calcularFilaEV(inputElement) {
+            const tr = inputElement.closest('tr');
+            const cantidadReal = parseFloat(inputElement.value) || 0;
+            const pu = parseFloat(tr.querySelector('.pu-act-txt').textContent) || 0;
+            
+            const evCalculado = cantidadReal * pu;
+            tr.querySelector('.ev-costo-txt').textContent = evCalculado.toFixed(2);
+            tr.querySelector('.ev-costo-txt').setAttribute('data-ev-valor', evCalculado);
+
+            calcularTotalesEVM();
+        }
+
+        // --- GESTIÓN DE LA TABLA DE RECURSOS (AC) ---
+        function agregarFilaRecurso() {
+            const tbody = document.querySelector('#tablaRecursos tbody');
+            
+            // Obtener nodos WBS de nivel padre (Entregables) para imputación directa de costos
+            const padresUnicos = [...new Set(BD_EDT.map(item => item.padre_id))];
+            let opcionesPadre = padresUnicos.map(p => `<option value="${p}">${p}</option>`).join('');
+
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td class="p-2 border">
+                    <select class="w-full p-1 border rounded bg-white input-wbs-padre">
+                        <option value="">-- Imputar a WBS --</option>
+                        ${opcionesPadre}
+                    </select>
+                </td>
+                <td class="p-2 border">
+                    <select class="w-full p-1 border rounded bg-white" onchange="cambiarTipoRecurso(this)">
+                        <option value="">-- Tipo --</option>
+                        <option value="MO">Mano de Obra</option>
+                        <option value="MAT_EQ">Materiales / Equipos</option>
+                    </select>
+                </td>
+                <td class="p-2 border">
+                    <select class="w-full p-1 border rounded bg-white select-recurso" onchange="completarDatosRecurso(this)" disabled>
+                        <option value="">-- Seleccione Recurso --</option>
+                    </select>
+                </td>
+                <td class="p-2 border">
+                    <input type="number" step="any" min="0" value="0" class="w-full p-1 border rounded text-right input-cant-rec" oninput="calcularFilaAC(this)" disabled>
+                </td>
+                <td class="p-2 border text-right text-gray-500 pu-rec-txt">0.00</td>
+                <td class="p-2 border text-right font-semibold text-amber-600 ac-costo-txt">0.00</td>
+            `;
+            tbody.appendChild(tr);
+        }
+
+        function cambiarTipoRecurso(selectTipo) {
+            const tr = selectTipo.closest('tr');
+            const selectRecurso = tr.querySelector('.select-recurso');
+            const tipo = selectTipo.value;
+
+            selectRecurso.innerHTML = '<option value="">-- Seleccione Recurso --</option>';
+            tr.querySelector('.input-cant-rec').disabled = true;
+            tr.querySelector('.input-cant-rec').value = 0;
+            tr.querySelector('.pu-rec-txt').textContent = "0.00";
+            tr.querySelector('.ac-costo-txt').textContent = "0.00";
+
+            if (!tipo) {
+                selectRecurso.disabled = true;
+                return;
+            }
+
+            selectRecurso.disabled = false;
+            let opciones = "";
+            if (tipo === "MO") {
+                opciones = BD_RRHH.map(r => `<option value="${r.recurso_id}">${r.descripcion} (${r.categoria})</option>`).join('');
+            } else {
+                opciones = BD_Almacen.map(r => `<option value="${r.recurso_id}">${r.descripcion}</option>`).join('');
+            }
+            selectRecurso.innerHTML += opciones;
+        }
+
+        function completarDatosRecurso(selectRecurso) {
+            const tr = selectRecurso.closest('tr');
+            const idRecurso = selectRecurso.value;
+            const tipo = tr.querySelector('select').value; 
+
+            if (!idRecurso) return;
+
+            let recurso = (tipo === "MO") ? BD_RRHH.find(r => r.recurso_id === idRecurso) : BD_Almacen.find(r => r.recurso_id === idRecurso);
+            
+            const pu = tipo === "MO" ? recurso.pu_hora : recurso.pu_real;
+            tr.querySelector('.pu-rec-txt').textContent = pu.toFixed(2);
+            
+            const inputCant = tr.querySelector('.input-cant-rec');
+            inputCant.disabled = false;
+            calcularFilaAC(inputCant);
+        }
+
+        function calcularFilaAC(inputElement) {
+            const tr = inputElement.closest('tr');
+            const cantidad = parseFloat(inputElement.value) || 0;
+            const pu = parseFloat(tr.querySelector('.pu-rec-txt').textContent) || 0;
+
+            const acCalculado = cantidad * pu;
+            tr.querySelector('.ac-costo-txt').textContent = acCalculado.toFixed(2);
+            tr.querySelector('.ac-costo-txt').setAttribute('data-ac-valor', acCalculado);
+
+            calcularTotalesEVM();
+        }
+
+        // --- CÁLCULOS GLOBALES DE CONTROL ---
+        function actualizarMetasYTotales() {
+            document.querySelectorAll('#tablaActividades tbody tr').forEach(tr => {
+                const select = tr.querySelector('.select-actividad');
+                if(select && select.value) completarDatosActividad(select);
+            });
+            calcularTotalesEVM();
+        }
+
+        function calcularTotalesEVM() {
+            let totalPV = 0;
+            let totalEV = 0;
+            let totalAC = 0;
+
+            // Sumar PV de las filas con actividad seleccionada
+            document.querySelectorAll('#tablaActividades tbody tr').forEach(tr => {
+                const pvCosto = parseFloat(tr.querySelector('.pv-plan-txt').getAttribute('data-pv-costo')) || 0;
+                const evCosto = parseFloat(tr.querySelector('.ev-costo-txt').getAttribute('data-ev-valor')) || 0;
+                if(tr.querySelector('.select-actividad').value) {
+                    totalPV += pvCosto;
+                    totalEV += evCosto;
+                }
+            });
+
+            // Sumar AC de las filas con recursos cargados
+            document.querySelectorAll('#tablaRecursos tbody tr').forEach(tr => {
+                const acCosto = parseFloat(tr.querySelector('.ac-costo-txt').getAttribute('data-ac-valor')) || 0;
+                totalAC += acCosto;
+            });
+
+            // Actualizar paneles visuales
+            document.getElementById('resumenPV').textContent = `$ ${totalPV.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+            document.getElementById('resumenEV').textContent = `$ ${totalEV.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+            document.getElementById('resumenAC').textContent = `$ ${totalAC.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+        }
+
+        // --- ENVÍO DE DATOS A GOOGLE SHEETS VIA API ---
+        document.getElementById('formReporte').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const fecha = document.getElementById('fechaReporte').value;
+            const responsable = document.getElementById('responsable').value;
+
+            // Estructurar payload transaccional unificado
+            const dataEnvio = {
+                fecha: fecha,
+                responsable: responsable,
+                contratista: "Cerro Nevado S.A.",
+                actividades: [],
+                recursos: []
+            };
+
+            // Extraer actividades ejecutadas
+            document.querySelectorAll('#tablaActividades tbody tr').forEach(tr => {
+                const wbs = tr.querySelector('.select-actividad').value;
+                if (wbs) {
+                    dataEnvio.actividades.push({
+                        wbs_id: wbs,
+                        metrado_pv: parseFloat(tr.querySelector('.pv-plan-txt').textContent) || 0,
+                        costo_pv: parseFloat(tr.querySelector('.pv-plan-txt').getAttribute('data-pv-costo')) || 0,
+                        metrado_ev: parseFloat(tr.querySelector('.input-ev').value) || 0,
+                        costo_ev: parseFloat(tr.querySelector('.ev-costo-txt').getAttribute('data-ev-valor')) || 0
+                    });
+                }
+            });
+
+            // Extraer recursos consumidos
+            document.querySelectorAll('#tablaRecursos tbody tr').forEach(tr => {
+                const wbsPadre = tr.querySelector('.input-wbs-padre').value;
+                const selectRecurso = tr.querySelector('.select-recurso');
+                if (wbsPadre && selectRecurso.value) {
+                    dataEnvio.recursos.push({
+                        wbs_padre: wbsPadre,
+                        recurso_id: selectRecurso.value,
+                        descripcion: selectRecurso.options[selectRecurso.selectedIndex].text,
+                        cantidad: parseFloat(tr.querySelector('.input-cant-rec').value) || 0,
+                        costo_ac: parseFloat(tr.querySelector('.ac-costo-txt').getAttribute('data-ac-valor')) || 0
+                    });
+                }
+            });
+
+            if (dataEnvio.actividades.length === 0 && dataEnvio.recursos.length === 0) {
+                alert("Por favor, registre al menos una actividad o un recurso antes de transmitir.");
+                return;
+            }
+
+            // Petición HTTP POST al backend en la nube
+            fetch(WEB_APP_URL, {
+                method: "POST",
+                mode: "no-cors", 
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(dataEnvio)
+            })
+            .then(() => {
+                alert("Información transmitida con éxito a Google Sheets para Cerro Nevado S.A.");
+                document.getElementById('formReporte').reset();
+                actualizarMetasYTotales();
+            })
+            .catch(error => {
+                console.error("Error en el envío de datos:", error);
+                alert("Ocurrió un error en la transmisión de datos. Verifique la consola.");
+            });
+        });
+    </script>
+</body>
+</html>
